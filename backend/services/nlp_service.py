@@ -7,14 +7,77 @@ from typing import Any
 
 class NLPService:
     ACTION_RULES: dict[str, str] = {
+        # Original
         "meet": "meeting",
         "meeting": "meeting",
         "call": "call",
         "send": "reminder",
+        
+        # Social activities
+        "lunch": "meeting",
+        "dinner": "meeting",
+        "breakfast": "meeting",
+        "coffee": "meeting",
+        "hangout": "meeting",
+        "hang": "meeting",
+        
+        # Discussions
+        "discuss": "meeting",
+        "talk": "call",
+        "chat": "meeting",
+        "sync": "meeting",
+        "align": "meeting",
+        "debrief": "meeting",
+        
+        # Work meetings
+        "present": "meeting",
+        "demo": "meeting",
+        "review": "meeting",
+        "interview": "meeting",
+        "pitch": "meeting",
+        
+        # Communications
+        "email": "reminder",
+        "text": "reminder",
+        "message": "reminder",
+        "notify": "reminder",
+        "contact": "call",
+        "inform": "reminder",
+        "tell": "reminder",
+        
+        # Reminder keywords
+        "remember": "reminder",
+        "remind": "reminder",
+        "note": "reminder",
+        "mark": "reminder",
+        "don't forget": "reminder",
     }
 
     def __init__(self) -> None:
         self.nlp = self._load_spacy_pipeline()
+        
+        # Time expression mapping for relative/urgency terms
+        self.TIME_MAP = {
+            "today": "today",
+            "tomorrow": "tomorrow", 
+            "tonight": "tonight",
+            "asap": "today",
+            "urgent": "today",
+            "immediately": "today",
+            "next week": "+7 days",
+            "next month": "+30 days",
+            "in 2 weeks": "+14 days",
+            "in a few days": "+3 days",
+            "soon": "+3 days",
+            "this weekend": "saturday",
+            "next monday": "monday",
+            "next tuesday": "tuesday",
+            "next wednesday": "wednesday",
+            "next thursday": "thursday",
+            "next friday": "friday",
+            "next saturday": "saturday",
+            "next sunday": "sunday",
+        }
 
     @staticmethod
     def _load_spacy_pipeline():
@@ -50,6 +113,14 @@ class NLPService:
         )
         if full_time_match:
             time_value = full_time_match.group(1)
+        
+        # Check for relative time expressions from TIME_MAP
+        if not time_value:
+            text_lower = text.lower()
+            for time_keyword, replacement in self.TIME_MAP.items():
+                if time_keyword in text_lower:
+                    time_value = replacement
+                    break
 
         if self.nlp is not None:
             doc = self.nlp(text)
@@ -155,6 +226,15 @@ class NLPService:
             return None
         text = time_value.lower().strip()
         now = datetime.utcnow()
+
+        # Handle relative time expressions like "+7 days"
+        if text.startswith("+"):
+            try:
+                days = int(text.split()[0][1:])  # Extract number after +
+                base = now + timedelta(days=days)
+                return base.replace(hour=9, minute=0, second=0, microsecond=0).isoformat()
+            except (ValueError, IndexError):
+                pass
 
         # Basic local parsing for "today/tomorrow at 4 PM" style phrases.
         hour_match = re.search(r"(\d{1,2})(?::(\d{2}))?\s*(am|pm)?", text)

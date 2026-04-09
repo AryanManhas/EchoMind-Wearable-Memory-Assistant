@@ -265,4 +265,29 @@ class ApiService {
       text: (parsed["text"] ?? "") as String,
     );
   }
+
+  /// Complete end-to-end pipeline query with full transparency
+  /// Returns all 7 pipeline stages and final output (Recall + Reminders)
+  Future<Map<String, dynamic>> pipelineQuery(String query) async {
+    final uri = Uri.parse("$baseUrl/pipeline/query");
+    final response = await http.post(
+      uri,
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({"query": query}),
+    );
+    if (response.statusCode >= 400) {
+      throw Exception("Pipeline query failed: ${response.body}");
+    }
+    return jsonDecode(response.body) as Map<String, dynamic>;
+  }
+
+  /// Get complete pipeline architecture and configuration info
+  Future<Map<String, dynamic>> getPipelineInfo() async {
+    final uri = Uri.parse("$baseUrl/pipeline/info");
+    final response = await http.get(uri);
+    if (response.statusCode >= 400) {
+      throw Exception("Failed to fetch pipeline info: ${response.body}");
+    }
+    return jsonDecode(response.body) as Map<String, dynamic>;
+  }
 }

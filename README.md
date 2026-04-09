@@ -1,15 +1,43 @@
-# Wearable AI Personal Memory Assistant Prototype
+# EchoMInd - Wearable AI Personal Memory Assistant 🎤
 
-Industry-style but student-achievable local prototype:
+**Status: ✅ VOICE MODULE ENABLED**
 
-- `backend/`: Flask API + Whisper STT + spaCy/rule NLP + SQLite + semantic/fallback search
-- `mobile_app/`: Flutter app with Today, Home, Memories, Search, Assistant + voice recording
-  - Includes deep-link style memory routing: `/memory/<id>` and `memory://id/<id>`
-  - Includes queryless reminder view (`Today`) with proactive brief
+Industry-style but student-achievable local prototype with full voice support:
 
-## 1) Architecture
+- **Backend:** Flask API + Vosk STT + spaCy NLP + SQLite + Search + Assistant
+- **Mobile App:** Flutter app with Text + Voice input, Memories, Search, Assistant
+- **Voice Features:** Recording + transcription + always-on listening + wake-word detection
+- **Features:** Deep-link style memory routing, daily brief, reminder management
 
-Pendant input (simulated text/audio) -> Mobile App (Flutter) -> Flask API -> Vosk (offline real-time STT) -> NLP (spaCy + rules) -> Memory structuring -> SQLite (+ optional embeddings) -> Search -> Response to app
+## Quick Start
+
+```powershell
+# Terminal 1 - Backend
+.\run_backend.ps1
+
+# Terminal 2 - App  
+cd mobile_app && flutter run
+```
+
+Then choose:
+- **Text:** Type in Home tab (no mic needed)
+- **Voice:** Record audio in Home tab (with microphone)
+- **Advanced:** Enable always-on mode with wake-word
+
+See [VOICE_QUICK_START.md](VOICE_QUICK_START.md) for detailed testing.
+
+## Documentation
+
+| Guide | Purpose | Time |
+|-------|---------|------|
+| [VOICE_QUICK_START.md](VOICE_QUICK_START.md) | Fast: Get running in 3 steps | 3 min |
+| [COMPLETE_SETUP.md](COMPLETE_SETUP.md) | Full: Text + Voice setup | 15 min |
+| [VOICE_TESTING.md](VOICE_TESTING.md) | Detailed: Voice module testing | comprehensive |
+| [QUICK_REF.md](QUICK_REF.md) | Cheat sheet: Commands & endpoints | reference |
+
+## Architecture
+
+Voice input (recorded) or Text input → Mobile App (Flutter) → Flask API → Vosk STT (offline) + NLP (spaCy) → Memory structuring → SQLite → Search/Assistant → Response
 
 ## 2) Backend Setup
 
